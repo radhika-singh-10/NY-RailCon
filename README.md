@@ -1,4 +1,4 @@
-# NY-RailCon: Centralized Database for Modern Railway Management - CSE-560-Data-Management-And-Query-Language
+# NYRailSyncDB: Centralized Database for Modern Railway Management - CSE-560-Data-Management-And-Query-Language
 
 The project seeks to establish a centralized relational database for the New York Railway System. Constructed using SQL in Postgres, this database manages all data related to the railway system. It has been designed to resolve issues faced by the previous manual system. The database continually links the railway system to multiple destinations. The objective is to enhance scheduling, maintenance, and asset management while adhering to regulatory standards and safety protocols.
 
