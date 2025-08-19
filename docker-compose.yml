@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  cockroach:
+    image: cockroachdb/cockroach:latest
+    command: start-single-node --insecure --store=/cockroach/cockroach-data --http-addr=0.0.0.0:8080 --listen-addr=0.0.0.0:26257
+    ports:
+      - "26257:26257"   # SQL / Postgres wire protocol
+      - "8080:8080"     # DB Console (web UI)
+    volumes:
+      - crdb-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "cockroach", "sql", "--insecure", "--execute=SHOW DATABASES;"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # One-shot init job: creates DB and a non-root user 
+  crdb-init:
+    image: cockroachdb/cockroach:latest
+    depends_on:
+      cockroach:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "cockroach sql --insecure
+       --execute=\"CREATE DATABASE IF NOT EXISTS nyrailsyncdb;
+                  CREATE USER IF NOT EXISTS nyrail WITH PASSWORD 'nyrailpw';
+                  GRANT ALL ON DATABASE nyrailsyncdb TO nyrail;\""
+    restart: "no"
+
+  # Optional: run the Python loader against CockroachDB
+  loader:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      # All popular Postgres clients work; Cockroach uses 26257 by default
+      # sslmode=disable because I'm running --insecure locally
+      DB_URL: postgresql://nyrail:nyrailpw@cockroach:26257/nyrailsyncdb?sslmode=disable
+    depends_on:
+      crdb-init:
+        condition: service_completed_successfully
+    command: >
+      bash -lc "pip install --no-cache-dir psycopg2-binary && python create-load-script.py"
+    # ^ adapt to whatever client the script uses (psycopg2/SQLAlchemy/etc.) , for us it SQLAlchemy
+
+volumes:
+  crdb-data:
