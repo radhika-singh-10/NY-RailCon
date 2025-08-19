@@ -1,4 +1,4 @@
-# NYRailSyncDB: Centralized Database for Modern Railway Management [PostGreSQL vs CockraochDB]- CSE-560-Data-Management-And-Query-Language
+# NYRailSyncDB: Centralized Database for Modern Railway Management [PostGreSQL vs CockroachDB]- CSE-560-Data-Management-And-Query-Language
 
 The project seeks to establish a measurement between a centralised and decentralized relational database for the New York Railway System. Constructed using SQL in Postgres and CockroachDB, the databases manage all data related to the railway system. It has been designed to resolve issues faced by the previous manual system. The databases continually link the railway system to multiple destinations. The objective is to enhance scheduling, maintenance, and asset management while adhering to regulatory standards and safety protocols.
 
